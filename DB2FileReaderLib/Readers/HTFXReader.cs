@@ -33,6 +33,7 @@ namespace DBFileReaderLib.Readers
 
         private static Dictionary<Type, Func<BitReader, object>> simpleReaders = new Dictionary<Type, Func<BitReader, object>>
         {
+            [typeof(ulong)] = (data) => GetFieldValue<ulong>(data),
             [typeof(long)] = (data) => GetFieldValue<long>(data),
             [typeof(float)] = (data) => GetFieldValue<float>(data),
             [typeof(int)] = (data) => GetFieldValue<int>(data),
@@ -68,7 +69,7 @@ namespace DBFileReaderLib.Readers
                 FieldCache<T> info = fields[i];
                 if (info.IndexMapField)
                 {
-                    info.Setter(entry, Convert.ChangeType(Id, info.Field.FieldType));
+                    info.Setter(entry, Convert.ChangeType(Id, info.FieldType));
                     continue;
                 }
 
@@ -76,20 +77,28 @@ namespace DBFileReaderLib.Readers
 
                 if (info.IsArray)
                 {
-                    if (arrayReaders.TryGetValue(info.Field.FieldType, out var reader))
+                    if (arrayReaders.TryGetValue(info.MetaDataFieldType, out var reader))
                         value = reader(m_data, info.Cardinality);
                     else
                         throw new Exception("Unhandled array type: " + typeof(T).Name);
                 }
                 else
                 {
-                    if (simpleReaders.TryGetValue(info.Field.FieldType, out var reader))
+                    if (simpleReaders.TryGetValue(info.MetaDataFieldType, out var reader))
                         value = reader(m_data);
                     else
                         throw new Exception("Unhandled field type: " + typeof(T).Name);
                 }
 
-                info.Setter(entry, value);
+                if (info.IsNonInlineRelation)
+                {
+                    var casted = Convert.ChangeType(value, info.FieldType);
+                    info.Setter(entry, casted);
+                }
+                else
+                {
+                    info.Setter(entry, value);
+                }
             }
         }
 

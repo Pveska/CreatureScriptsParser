@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DBFileReaderLib.Common;
 using DBFileReaderLib.Readers;
 
 namespace DBFileReaderLib
 {
-    public sealed class DBReader
+    public class DBReader
     {
         private readonly BaseReader _reader;
 
@@ -20,14 +21,10 @@ namespace DBFileReaderLib
         public uint LayoutHash => _reader.LayoutHash;
         public int IdFieldIndex => _reader.IdFieldIndex;
         public DB2Flags Flags => _reader.Flags;
-        public readonly string FileName;
 
         #endregion
 
-        public DBReader(string patch, string fileName) : this(File.Open(Path.Combine(patch, fileName), FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            FileName = fileName;
-        }
+        public DBReader(string fileName) : this(File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read)) { }
 
         public DBReader(Stream stream)
         {
@@ -71,26 +68,36 @@ namespace DBFileReaderLib
             }
         }
 
+
         public Storage<T> GetRecords<T>() where T : class, new() => new Storage<T>(this);
 
         public void PopulateRecords<T>(IDictionary<int, T> storage) where T : class, new() => ReadRecords(storage);
 
-        private void ReadRecords<T>(IDictionary<int, T> storage) where T : class, new()
-        {
-            var startTime = DateTime.Now;
 
+        protected virtual void ReadRecords<T>(IDictionary<int, T> storage) where T : class, new()
+        {
             var fieldCache = typeof(T).GetFields().Select(x => new FieldCache<T>(x)).ToArray();
 
             _reader.Enumerate((row) =>
             {
-                var entry = new T();
+                T entry = new T();
                 row.GetFields(fieldCache, entry);
                 lock (storage)
                     storage.Add(row.Id, entry);
             });
+        }
 
-            var span = DateTime.Now.Subtract(startTime);
-            Console.WriteLine($"{  FileName.PadRight(33) } { TimeSpan.FromTicks(span.Ticks).ToString().PadRight(28) } { storage.Count.ToString().PadRight(19) }");
+
+        public Dictionary<ulong, int> GetEncryptedSections()
+        {
+            var reader = this._reader as IEncryptionSupportingReader;
+
+            if (reader == null)
+            {
+                return new Dictionary<ulong, int>();
+            }
+
+            return reader.GetEncryptedSections().ToDictionary(s => s.TactKeyLookup, s => s.NumRecords);
         }
     }
 }

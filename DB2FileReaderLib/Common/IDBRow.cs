@@ -1,4 +1,8 @@
-﻿namespace DBFileReaderLib.Common
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DBFileReaderLib.Common
 {
     interface IDBRow
     {
