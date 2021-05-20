@@ -322,7 +322,7 @@ namespace CreatureScriptsParser
                             updatePacketsList.Add(updatePacket);
                         }
                     }
-                    else if (lines[itr.Key].Contains("DestroyObjectsCount"))
+                    else if (lines[itr.Key].Contains("DestroyedObjCount"))
                     {
                         Parallel.For(itr.Key, itr.Value, index =>
                         {

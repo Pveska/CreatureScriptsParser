@@ -88,12 +88,12 @@ namespace CreatureScriptsParser
                                 {
                                     i++;
 
-                                    if (!hasDestroyObjects && lines[i].Contains("DestroyObjectsCount") && !lines[i].Contains("DestroyObjectsCount : 0"))
+                                    if (!hasDestroyObjects && lines[i].Contains("DestroyedObjCount") && !lines[i].Contains("DestroyedObjCount : 0"))
                                     {
                                         hasDestroyObjects = true;
                                     }
 
-                                    if (lines[i].Contains("UpdateType:") || ((lines[i].Contains("DestroyObjectsCount") || lines[i].Contains("DataSize")) && hasDestroyObjects) || lines[i] == "")
+                                    if (lines[i].Contains("UpdateType:") || ((lines[i].Contains("DestroyedObjCount") || lines[i].Contains("DataSize")) && hasDestroyObjects) || lines[i] == "")
                                     {
                                         if (indexesDictionary.Count() == 0)
                                         {
