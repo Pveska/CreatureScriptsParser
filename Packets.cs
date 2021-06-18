@@ -884,7 +884,7 @@ namespace CreatureScriptsParser
 
             public static bool IsCreatureText(string line)
             {
-                if (line.Contains("SlashCmd: 12 (MonsterSay)") || line.Contains("SlashCmd: 14(MonsterYell)"))
+                if (line.Contains("SlashCmd: 12 (MonsterSay)") || line.Contains("SlashCmd: 14 (MonsterYell)"))
                     return true;
 
                 return false;
