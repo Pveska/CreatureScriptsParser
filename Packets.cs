@@ -884,7 +884,7 @@ namespace CreatureScriptsParser
 
             public static bool IsCreatureText(string line)
             {
-                if (line.Contains("SlashCmd: 12 (MonsterSay)") || line.Contains("SlashCmd: 14 (MonsterYell)"))
+                if (LineGetters.GetGuidFromLine(line, senderGuid: true) != "")
                     return true;
 
                 return false;
@@ -902,7 +902,7 @@ namespace CreatureScriptsParser
             {
                 ChatPacket chatPacket = new ChatPacket(packet.type, packet.time, packet.number);
 
-                if (IsCreatureText(lines[packet.startIndex + 1]))
+                if (IsCreatureText(lines[packet.startIndex + 3]))
                 {
                     Parallel.For(packet.startIndex, packet.endIndex, x =>
                     {
