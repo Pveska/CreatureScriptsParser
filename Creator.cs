@@ -214,6 +214,21 @@ namespace CreatureScriptsParser
                             {
                                 output += "me->SetEmoteState(" + (EmotePacket.Emote)updateObjectPacket.emoteStateId + ");" + "\r\n";
                             }
+
+                            if (updateObjectPacket.unitFlags != null)
+                            {
+                                output += $"me->SetUnitFlags({BuildUnitFlagNames(updateObjectPacket.unitFlags)});" + "\r\n";
+                            }
+
+                            if (updateObjectPacket.unitFlags2 != null)
+                            {
+                                output += $"me->SetUnitFlags2({BuildUnitFlag2Names(updateObjectPacket.unitFlags2)});" + "\r\n";
+                            }
+
+                            if (updateObjectPacket.unitFlags3 != null)
+                            {
+                                output += $"me->SetUnitFlags3({BuildUnitFlag3Names(updateObjectPacket.unitFlags3)});" + "\r\n";
+                            }
                         }
                         else if (updateObjectPacket.updateType == UpdateObjectPacket.UpdateType.Destroy)
                         {
@@ -454,6 +469,99 @@ namespace CreatureScriptsParser
             }
 
             return 0;
+        }
+
+        private string BuildUnitFlagNames(long? unitFlags)
+        {
+            string unitFlagNames = "";
+            List<long> unitFlagsList = new List<long>();
+
+            if (unitFlags != 0)
+            {
+                var flagsArray = Enum.GetValues(typeof(UpdateObjectPacket.UnitFlags));
+                Array.Reverse(flagsArray);
+
+                foreach (long flag in flagsArray)
+                {
+                    if (unitFlags - flag >= 0)
+                    {
+                        unitFlagsList.Add(flag);
+                        unitFlags -= flag;
+                    }
+                }
+            }
+            else
+                return unitFlagNames = "eUnitFlags(0)";
+
+            if (unitFlagsList.Count > 1)
+            {
+                unitFlagNames += $"eUnitFlags(" + unitFlagsList.Aggregate(unitFlagNames, (current, itr) => current + ((UpdateObjectPacket.UnitFlags)itr + " | ")) + ")";
+                return unitFlagNames.Replace(" | )", ")");
+            }
+            else
+                return unitFlagNames = ((UpdateObjectPacket.UnitFlags)unitFlagsList.FirstOrDefault()).ToString();
+        }
+
+        private string BuildUnitFlag2Names(long? unitFlags)
+        {
+            string unitFlagNames = "";
+            List<long> unitFlagsList = new List<long>();
+
+            if (unitFlags != 0)
+            {
+                var flagsArray = Enum.GetValues(typeof(UpdateObjectPacket.UnitFlags2));
+                Array.Reverse(flagsArray);
+
+                foreach (long flag in flagsArray)
+                {
+                    if (unitFlags - flag >= 0)
+                    {
+                        unitFlagsList.Add(flag);
+                        unitFlags -= flag;
+                    }
+                }
+            }
+            else
+                return unitFlagNames = "eUnitFlags2(0)";
+
+            if (unitFlagsList.Count > 1)
+            {
+                unitFlagNames += $"eUnitFlags2(" + unitFlagsList.Aggregate(unitFlagNames, (current, itr) => current + ((UpdateObjectPacket.UnitFlags2)itr + " | ")) + ")";
+                return unitFlagNames.Replace(" | )", ")");
+            }
+            else
+                return unitFlagNames = ((UpdateObjectPacket.UnitFlags2)unitFlagsList.FirstOrDefault()).ToString();
+        }
+
+        private string BuildUnitFlag3Names(long? unitFlags)
+        {
+            string unitFlagNames = "";
+            List<long> unitFlagsList = new List<long>();
+
+            if (unitFlags != 0)
+            {
+                var flagsArray = Enum.GetValues(typeof(UpdateObjectPacket.UnitFlags3));
+                Array.Reverse(flagsArray);
+
+                foreach (long flag in flagsArray)
+                {
+                    if (unitFlags - flag >= 0)
+                    {
+                        unitFlagsList.Add(flag);
+                        unitFlags -= flag;
+                    }
+                }
+            }
+            else
+                return unitFlagNames = "eUnitFlags3(0)";
+
+            if (unitFlagsList.Count > 1)
+            {
+                unitFlagNames += $"eUnitFlags3(" + unitFlagsList.Aggregate(unitFlagNames, (current, itr) => current + ((UpdateObjectPacket.UnitFlags3)itr + " | ")) + ")";
+                return unitFlagNames.Replace(" | )", ")");
+            }
+            else
+                return unitFlagNames = ((UpdateObjectPacket.UnitFlags3)unitFlagsList.FirstOrDefault()).ToString();
         }
     }
 }

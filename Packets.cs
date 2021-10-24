@@ -61,6 +61,9 @@ namespace CreatureScriptsParser
             public bool hasReplacedObject;
             public List<string> conversationActors;
             public MonsterMovePacket moveData;
+            public long? unitFlags;
+            public long? unitFlags2;
+            public long? unitFlags3;
 
             public UpdateObjectPacket(PacketTypes packetType, TimeSpan time, long number, UpdateType updateType, ObjectType objectType) : base(packetType, time, number)
             { this.updateType = updateType; this.objectType = objectType; }
@@ -97,6 +100,114 @@ namespace CreatureScriptsParser
                 UNIT_STAND_STATE_DEAD              = 7,
                 UNIT_STAND_STATE_KNEEL             = 8,
                 UNIT_STAND_STATE_SUBMERGED         = 9
+            };
+
+            public enum UnitFlags : long
+            {
+                NotClientControlled        = 0x00000001,
+                Spawning                   = 0x00000002,
+                RemoveClientControl        = 0x00000004,
+                PlayerControlled           = 0x00000008,
+                Rename                     = 0x00000010,
+                Preparation                = 0x00000020,
+                Unk6                       = 0x00000040,
+                NoAttack                   = 0x00000080,
+                ImmunePC                   = 0x00000100,
+                ImmuneNPC                  = 0x00000200,
+                Looting                    = 0x00000400,
+                PetIsAttackingTarget       = 0x00000800,
+                PVP                        = 0x00001000,
+                Silenced                   = 0x00002000,
+                CannotSwim                 = 0x00004000,
+                CanSwim                    = 0x00008000,
+                NoAttack2                  = 0x00010000,
+                Pacified                   = 0x00020000,
+                Stunned                    = 0x00040000,
+                AffectingCombat            = 0x00080000,
+                OnTaxi                     = 0x00100000,
+                Disarmed                   = 0x00200000,
+                Confused                   = 0x00400000,
+                Feared                     = 0x00800000,
+                PossessedByPlayer          = 0x01000000,
+                Uninteractible             = 0x02000000,
+                Skinnable                  = 0x04000000,
+                Mount                      = 0x08000000,
+                PreventKneelingWhenLooting = 0x10000000,
+                PreventEmotes              = 0x20000000,
+                Sheath                     = 0x40000000,
+                Immune                     = 0x80000000
+            };
+
+            public enum UnitFlags2 : long
+            {
+                UNIT_FLAG2_FEIGN_DEATH                  = 0x00000001,
+                UNIT_FLAG2_UNK1                         = 0x00000002,
+                UNIT_FLAG2_IGNORE_REPUTATION            = 0x00000004,
+                UNIT_FLAG2_COMPREHEND_LANG              = 0x00000008,
+                UNIT_FLAG2_MIRROR_IMAGE                 = 0x00000010,
+                UNIT_FLAG2_INSTANTLY_APPEAR_MODEL       = 0x00000020,
+                UNIT_FLAG2_FORCE_MOVEMENT               = 0x00000040,
+                UNIT_FLAG2_DISARM_OFFHAND               = 0x00000080,
+                UNIT_FLAG2_DISABLE_PRED_STATS           = 0x00000100,
+                UNIT_FLAG2_ALLOW_CHANGING_TALENTS       = 0x00000200,
+                UNIT_FLAG2_DISARM_RANGED                = 0x00000400,
+                UNIT_FLAG2_REGENERATE_POWER             = 0x00000800,
+                UNIT_FLAG2_RESTRICT_PARTY_INTERACTION   = 0x00001000,
+                UNIT_FLAG2_PREVENT_SPELL_CLICK          = 0x00002000,
+                UNIT_FLAG2_ALLOW_ENEMY_INTERACT         = 0x00004000,
+                UNIT_FLAG2_DISABLE_TURN                 = 0x00008000,
+                UNIT_FLAG2_UNK2                         = 0x00010000,
+                UNIT_FLAG2_PLAY_DEATH_ANIM              = 0x00020000,
+                UNIT_FLAG2_ALLOW_CHEAT_SPELLS           = 0x00040000,
+                UNIT_FLAG2_NO_ACTIONS                   = 0x00080000,
+                UNIT_FLAG2_UNK4                         = 0x00100000,
+                UNIT_FLAG2_UNK5                         = 0x00200000,
+                UNIT_FLAG2_UNK6                         = 0x00400000,
+                UNIT_FLAG2_UNK7                         = 0x00800000,
+                UNIT_FLAG2_UNK8                         = 0x01000000,
+                UNIT_FLAG2_UPDATE_REACTION              = 0x02000000,
+                UNIT_FLAG2_SELECTION_DISABLED           = 0x04000000,
+                UNIT_FLAG2_UNK11                        = 0x08000000,
+                UNIT_FLAG2_UNK12                        = 0x10000000,
+                UNIT_FLAG2_UNK13                        = 0x20000000,
+                UNIT_FLAG2_UNK14                        = 0x40000000,
+                UNIT_FLAG2_UNK15                        = 0x80000000
+            };
+
+            public enum UnitFlags3 : long
+            {
+                UNIT_FLAG3_PASSIVE_AI                   = 0x00000001,
+                UNIT_FLAG3_UNK2                         = 0x00000002,
+                UNIT_FLAG3_CAN_FIGHT_WITHOUT_DISMOUNT   = 0x00000004,
+                UNIT_FLAG3_UNK4                         = 0x00000008,
+                UNIT_FLAG3_UNK5                         = 0x00000010,
+                UNIT_FLAG3_UNK6                         = 0x00000020,
+                UNIT_FLAG3_UNK7                         = 0x00000040,
+                UNIT_FLAG3_UNK8                         = 0x00000080,
+                UNIT_FLAG3_UNK9                         = 0x00000100,
+                UNIT_FLAG3_UNK10                        = 0x00000200,
+                UNIT_FLAG3_UNK11                        = 0x00000400,
+                UNIT_FLAG3_UNK12                        = 0x00000800,
+                UNIT_FLAG3_UNK13                        = 0x00001000,
+                UNIT_FLAG3_DISPLAY_AS_CORPSE            = 0x00002000,
+                UNIT_FLAG3_UNK15                        = 0x00004000,
+                UNIT_FLAG3_UNK16                        = 0x00008000,
+                UNIT_FLAG3_UNK17                        = 0x00010000,
+                UNIT_FLAG3_ALREADY_MINED_OR_SKINNED     = 0x00020000,
+                UNIT_FLAG3_UNK19                        = 0x00040000,
+                UNIT_FLAG3_UNK20                        = 0x00080000,
+                UNIT_FLAG3_UNK21                        = 0x00100000,
+                UNIT_FLAG3_UNK22                        = 0x00200000,
+                UNIT_FLAG3_UNK23                        = 0x00400000,
+                UNIT_FLAG3_UNK24                        = 0x00800000,
+                UNIT_FLAG3_UNK25                        = 0x01000000,
+                UNIT_FLAG3_UNK26                        = 0x02000000,
+                UNIT_FLAG3_UNK27                        = 0x04000000,
+                UNIT_FLAG3_UNK28                        = 0x08000000,
+                UNIT_FLAG3_UNK29                        = 0x10000000,
+                UNIT_FLAG3_UNK30                        = 0x20000000,
+                UNIT_FLAG3_UNK31                        = 0x40000000,
+                UNIT_FLAG3_UNK32                        = 0x80000000
             };
 
             public static bool IsLineValidForObjectParse(string line)
@@ -230,6 +341,33 @@ namespace CreatureScriptsParser
                 return 0;
             }
 
+            public static uint? GetUnitFlagsFromLine(string line)
+            {
+                Regex durationRegex = new Regex(@"\(UnitData\) Flags:{1}\s{1}\w+");
+                if (durationRegex.IsMatch(line))
+                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags: ", ""));
+
+                return null;
+            }
+
+            public static uint? GetUnitFlags2FromLine(string line)
+            {
+                Regex durationRegex = new Regex(@"\(UnitData\) Flags2:{1}\s{1}\w+");
+                if (durationRegex.IsMatch(line))
+                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags2: ", ""));
+
+                return null;
+            }
+
+            public static uint? GetUnitFlags3FromLine(string line)
+            {
+                Regex durationRegex = new Regex(@"\(UnitData\) Flags3:{1}\s{1}\w+");
+                if (durationRegex.IsMatch(line))
+                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags3: ", ""));
+
+                return null;
+            }
+
             public static IEnumerable<UpdateObjectPacket> ParseObjectUpdatePacket(string[] lines, Packet packet)
             {
                 SynchronizedCollection<UpdateObjectPacket> updatePacketsList = new SynchronizedCollection<UpdateObjectPacket>();
@@ -327,10 +465,19 @@ namespace CreatureScriptsParser
 
                             else if (GetStandStateFromLine(lines[index]) != null)
                                 updatePacket.standState = GetStandStateFromLine(lines[index]);
+
+                            else if (GetUnitFlagsFromLine(lines[index]) != null)
+                                updatePacket.unitFlags = GetUnitFlagsFromLine(lines[index]);
+
+                            else if (GetUnitFlags2FromLine(lines[index]) != null)
+                                updatePacket.unitFlags2 = GetUnitFlags2FromLine(lines[index]);
+
+                            else if (GetUnitFlags3FromLine(lines[index]) != null)
+                                updatePacket.unitFlags3 = GetUnitFlags3FromLine(lines[index]);
                         });
 
                         if (updatePacket.guid != "" && (updatePacket.emoteStateId != null || updatePacket.sheatheState != null ||
-                            updatePacket.standState != null))
+                            updatePacket.standState != null || updatePacket.unitFlags != null || updatePacket.unitFlags2 != null || updatePacket.unitFlags3 != null))
                         {
                             updatePacketsList.Add(updatePacket);
                         }
