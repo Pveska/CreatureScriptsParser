@@ -229,6 +229,11 @@ namespace CreatureScriptsParser
                             {
                                 output += $"me->SetUnitFlags3({BuildUnitFlag3Names(updateObjectPacket.unitFlags3)});" + "\r\n";
                             }
+
+                            if (updateObjectPacket.factionTemplate != 0)
+                            {
+                                output += $"me->setFaction({updateObjectPacket.factionTemplate});" + "\r\n";
+                            }
                         }
                         else if (updateObjectPacket.updateType == UpdateObjectPacket.UpdateType.Destroy)
                         {

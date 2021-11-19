@@ -64,6 +64,7 @@ namespace CreatureScriptsParser
             public long? unitFlags;
             public long? unitFlags2;
             public long? unitFlags3;
+            public uint factionTemplate;
 
             public UpdateObjectPacket(PacketTypes packetType, TimeSpan time, long number, UpdateType updateType, ObjectType objectType) : base(packetType, time, number)
             { this.updateType = updateType; this.objectType = objectType; }
@@ -343,29 +344,38 @@ namespace CreatureScriptsParser
 
             public static uint? GetUnitFlagsFromLine(string line)
             {
-                Regex durationRegex = new Regex(@"\(UnitData\) Flags:{1}\s{1}\w+");
-                if (durationRegex.IsMatch(line))
-                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags: ", ""));
+                Regex unitFlagsRegex = new Regex(@"\(UnitData\) Flags:{1}\s{1}\w+");
+                if (unitFlagsRegex.IsMatch(line))
+                    return Convert.ToUInt32(unitFlagsRegex.Match(line).ToString().Replace("(UnitData) Flags: ", ""));
 
                 return null;
             }
 
             public static uint? GetUnitFlags2FromLine(string line)
             {
-                Regex durationRegex = new Regex(@"\(UnitData\) Flags2:{1}\s{1}\w+");
-                if (durationRegex.IsMatch(line))
-                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags2: ", ""));
+                Regex unitFlags2Regex = new Regex(@"\(UnitData\) Flags2:{1}\s{1}\w+");
+                if (unitFlags2Regex.IsMatch(line))
+                    return Convert.ToUInt32(unitFlags2Regex.Match(line).ToString().Replace("(UnitData) Flags2: ", ""));
 
                 return null;
             }
 
             public static uint? GetUnitFlags3FromLine(string line)
             {
-                Regex durationRegex = new Regex(@"\(UnitData\) Flags3:{1}\s{1}\w+");
-                if (durationRegex.IsMatch(line))
-                    return Convert.ToUInt32(durationRegex.Match(line).ToString().Replace("(UnitData) Flags3: ", ""));
+                Regex unitFlags3Regex = new Regex(@"\(UnitData\) Flags3:{1}\s{1}\w+");
+                if (unitFlags3Regex.IsMatch(line))
+                    return Convert.ToUInt32(unitFlags3Regex.Match(line).ToString().Replace("(UnitData) Flags3: ", ""));
 
                 return null;
+            }
+
+            public static uint GetFactionTemplateFromLine(string line)
+            {
+                Regex factionTemplateRegex = new Regex(@"\(UnitData\) FactionTemplate:{1}\s{1}\w+");
+                if (factionTemplateRegex.IsMatch(line))
+                    return Convert.ToUInt32(factionTemplateRegex.Match(line).ToString().Replace("(UnitData) FactionTemplate: ", ""));
+
+                return 0;
             }
 
             public static IEnumerable<UpdateObjectPacket> ParseObjectUpdatePacket(string[] lines, Packet packet)
@@ -474,10 +484,14 @@ namespace CreatureScriptsParser
 
                             else if (GetUnitFlags3FromLine(lines[index]) != null)
                                 updatePacket.unitFlags3 = GetUnitFlags3FromLine(lines[index]);
+
+                            else if (GetFactionTemplateFromLine(lines[index]) != 0)
+                                updatePacket.factionTemplate = GetFactionTemplateFromLine(lines[index]);
                         });
 
                         if (updatePacket.guid != "" && (updatePacket.emoteStateId != null || updatePacket.sheatheState != null ||
-                            updatePacket.standState != null || updatePacket.unitFlags != null || updatePacket.unitFlags2 != null || updatePacket.unitFlags3 != null))
+                            updatePacket.standState != null || updatePacket.unitFlags != null || updatePacket.unitFlags2 != null ||
+                            updatePacket.unitFlags3 != null || updatePacket.factionTemplate != 0))
                         {
                             updatePacketsList.Add(updatePacket);
                         }
