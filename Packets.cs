@@ -551,7 +551,7 @@ namespace CreatureScriptsParser
             public string castGuid;
             public uint spellId;
             public Position destination;
-            public List<string> targetGuids;
+            public List<string> targetGuids = new List<string>();
 
             public SpellStartPacket(PacketTypes packetType, TimeSpan time, long number) : base(packetType, time, number) { }
             public static uint GetSpellIdFromLine(string line)
@@ -689,7 +689,12 @@ namespace CreatureScriptsParser
                             spellPacket.destination = GetSpellDestinationFromLine(lines[x]);
 
                         else if(GetHitTargetGuidsFromLine(lines, x).Count != 0)
-                            spellPacket.targetGuids = GetHitTargetGuidsFromLine(lines, x);
+                        {
+                            lock (spellPacket.targetGuids)
+                            {
+                                spellPacket.targetGuids = spellPacket.targetGuids.Union(GetHitTargetGuidsFromLine(lines, x)).ToList();
+                            }
+                        }
                     });
 
                 }
