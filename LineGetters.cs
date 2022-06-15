@@ -5,7 +5,7 @@ namespace CreatureScriptsParser
 {
     public static class LineGetters
     {
-        public static string GetGuidFromLine(string line, bool unitGuid = false, bool senderGuid = false, bool moverGuid = false, bool attackerGuid = false, bool casterGuid = false, bool hitTargetGuid = false, bool castGuid = false, bool oneShotAnimKitGuid = false, bool emoteGuid = false, bool conversationActorGuid = false)
+        public static string GetGuidFromLine(string line, bool unitGuid = false, bool senderGuid = false, bool moverGuid = false, bool attackerGuid = false, bool casterGuid = false, bool hitTargetGuid = false, bool castGuid = false, bool oneShotAnimKitGuid = false, bool emoteGuid = false, bool conversationActorGuid = false, bool sourceObjectGuid = false)
         {
             if (!line.Contains("TypeName: Creature; Full:") && !line.Contains("TypeName: Vehicle; Full:") &&
                 !line.Contains("TypeName: Cast; Full:") && !line.Contains("TypeName: Conversation; Full:") && !casterGuid)
@@ -72,6 +72,12 @@ namespace CreatureScriptsParser
                 Regex guidRegex = new Regex(@"ActorGUID: TypeName:{1}\s{1}[a-zA-Z]+;{1}\s{1}Full:{1}\s{1}\w{20,}");
                 if (guidRegex.IsMatch(line))
                     return guidRegex.Match(line).ToString().Replace("ActorGUID: TypeName: ", "").Replace(objectTypeRegex.Match(line).ToString(), "");
+            }
+            else if (sourceObjectGuid)
+            {
+                Regex guidRegex = new Regex(@"SourceObjectGUID: TypeName:{1}\s{1}[a-zA-Z]+;{1}\s{1}Full:{1}\s{1}\w{20,}");
+                if (guidRegex.IsMatch(line))
+                    return guidRegex.Match(line).ToString().Replace("SourceObjectGUID: TypeName: ", "").Replace(objectTypeRegex.Match(line).ToString(), "");
             }
             else
             {

@@ -279,6 +279,17 @@ namespace CreatureScriptsParser
 
                         break;
                     }
+                    case Packet.PacketTypes.SMSG_PLAY_OBJECT_SOUND:
+                    {
+                        PlayObjectSoundPacket playObjectSoundPacket = PlayObjectSoundPacket.ParsePlayObjectSoundPacketPacket(lines, packet);
+
+                        if (playObjectSoundPacket.guid != "")
+                        {
+                            packetsList.Add(playObjectSoundPacket);
+                        }
+
+                        break;
+                    }
                     default:
                         break;
                 }

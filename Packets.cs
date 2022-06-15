@@ -32,17 +32,18 @@ namespace CreatureScriptsParser
 
             public enum PacketTypes
             {
-                Unknown_PACKET              = 0,
-                SMSG_UPDATE_OBJECT          = 1,
-                SMSG_SPELL_START            = 2,
-                SMSG_SPELL_GO               = 3,
-                SMSG_ON_MONSTER_MOVE        = 4,
-                SMSG_PLAY_ONE_SHOT_ANIM_KIT = 5,
-                SMSG_CHAT                   = 6,
-                SMSG_EMOTE                  = 7,
-                SMSG_AURA_UPDATE            = 8,
-                SMSG_SET_AI_ANIM_KIT        = 9,
-                SMSG_PLAY_SPELL_VISUAL_KIT  = 10
+                Unknown_PACKET,
+                SMSG_UPDATE_OBJECT,
+                SMSG_SPELL_START,
+                SMSG_SPELL_GO,
+                SMSG_ON_MONSTER_MOVE,
+                SMSG_PLAY_ONE_SHOT_ANIM_KIT,
+                SMSG_CHAT,
+                SMSG_EMOTE,
+                SMSG_AURA_UPDATE,
+                SMSG_SET_AI_ANIM_KIT,
+                SMSG_PLAY_SPELL_VISUAL_KIT,
+                SMSG_PLAY_OBJECT_SOUND
             }
         }
 
@@ -1725,6 +1726,43 @@ namespace CreatureScriptsParser
                 }
 
                 return spellVisualPacket;
+            }
+        }
+
+        [Serializable]
+        public class PlayObjectSoundPacket : Packet
+        {
+            public uint SoundId;
+            public Position position;
+
+            public PlayObjectSoundPacket(PacketTypes type, TimeSpan time, long number) : base(type, time, number) { }
+
+            public static uint GetSoundIdFromLine(string line)
+            {
+                Regex soundIdRegexRegex = new Regex(@"SoundId:{1}\s+\d+");
+                if (soundIdRegexRegex.IsMatch(line))
+                    return Convert.ToUInt32(soundIdRegexRegex.Match(line).ToString().Replace("SoundId: ", ""));
+
+                return 0;
+            }
+
+            public static PlayObjectSoundPacket ParsePlayObjectSoundPacketPacket(string[] lines, Packet packet)
+            {
+                PlayObjectSoundPacket soundPacket = new PlayObjectSoundPacket(packet.type, packet.time, packet.number);
+
+                Parallel.For(packet.startIndex, packet.endIndex, x =>
+                {
+                    if (LineGetters.GetGuidFromLine(lines[x], sourceObjectGuid: true) != "")
+                        soundPacket.guid = LineGetters.GetGuidFromLine(lines[x], sourceObjectGuid: true);
+
+                    else if (GetSoundIdFromLine(lines[x]) != 0)
+                        soundPacket.SoundId = GetSoundIdFromLine(lines[x]);
+
+                    else if (MonsterMovePacket.GetPositionFromLine(lines[x]).IsValid())
+                        soundPacket.position = MonsterMovePacket.GetPositionFromLine(lines[x]);
+                });
+
+                return soundPacket;
             }
         }
     }

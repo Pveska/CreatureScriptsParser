@@ -451,6 +451,23 @@ namespace CreatureScriptsParser
                         output += "me->SendPlaySpellVisualKit(" + playSpellVisualKitPacket.KitRecId + ", " + playSpellVisualKitPacket.KitType + ", " + playSpellVisualKitPacket.Duration +  ");" + "\r\n";
                         break;
                     }
+                    case Packet.PacketTypes.SMSG_PLAY_OBJECT_SOUND:
+                    {
+                        PlayObjectSoundPacket playObjectSoundPacket = (PlayObjectSoundPacket)packet;
+                        Position spawnPos = ((UpdateObjectPacket)packetsList.FirstOrDefault(x => ((Packet)x).type == Packet.PacketTypes.SMSG_UPDATE_OBJECT && ((Packet)x).guid == guid && ((UpdateObjectPacket)x).updateType == UpdateObjectPacket.UpdateType.CreateObject)).spawnPosition;
+                        spawnPos.orientation = 0.0f;
+
+                        if (spawnPos == playObjectSoundPacket.position)
+                        {
+                            output += $"me->PlayDistanceSound(me, {playObjectSoundPacket.SoundId}, me, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());" + "\r\n";
+                        }
+                        else
+                        {
+                            output += $"me->PlayDistanceSound(me, {playObjectSoundPacket.SoundId}, me, {playObjectSoundPacket.position.x.GetValueWithoutComma()}f, {playObjectSoundPacket.position.y.GetValueWithoutComma()}f, {playObjectSoundPacket.position.z.GetValueWithoutComma()}f);" + "\r\n";
+                        }
+
+                        break;
+                    }
                     default:
                         break;
                 }
