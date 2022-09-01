@@ -324,6 +324,8 @@ namespace CreatureScriptsParser
                             if (!monsterMovePacket.HasJump())
                             {
                                 output += "Velocity: " + Convert.ToString(monsterMovePacket.GetWaypointsVelocity()).Replace(",", ".") + "f" + "\r\n";
+
+
                                 output += monsterMovePacket.GetSetSpeedString() + "\r\n";
 
                                 if (monsterMovePacket.waypoints.Count() == 1)
@@ -344,8 +346,26 @@ namespace CreatureScriptsParser
                                         }
                                         case MonsterMovePacket.MoveTypes.FLY:
                                         {
-                                            output += "Position const g_" + ConverNameToCoreFormat(creatureName) + "FlyPos = { " + monsterMovePacket.waypoints.First().ToString() + " };" + "\r\n";
-                                            output += "me->GetMotionMaster()->MoveSmoothFlyPath(ePoints::FlyEnd, Positions::g_" + ConverNameToCoreFormat(creatureName) + "FlyPos" + ");" + "\r\n";
+                                            if (monsterMovePacket.tierTransitionId != 0)
+                                            {
+                                                if (monsterMovePacket.waypoints.First().x == monsterMovePacket.startPosition.x && monsterMovePacket.waypoints.First().y == monsterMovePacket.startPosition.y)
+                                                {
+                                                    float distance = monsterMovePacket.waypoints.First().z - monsterMovePacket.startPosition.z;
+                                                    string distanceStr = distance.ToString().Length > 1 ? distance.GetValueWithoutComma() : distance.ToString() + ".0f";
+                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}MoveUpEnd,  {distanceStr}, {monsterMovePacket.tierTransitionId});" + "\r\n";
+                                                }
+                                                else
+                                                {
+                                                    output += $"Position const g_{ConverNameToCoreFormat(creatureName)}MoveUpPos = {{ {monsterMovePacket.waypoints.First()} }};" + "\r\n";
+                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}MoveUpEnd, g_{ConverNameToCoreFormat(creatureName)}MoveUpPos, {monsterMovePacket.tierTransitionId});" + "\r\n";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                output += "Position const g_" + ConverNameToCoreFormat(creatureName) + "FlyPos = { " + monsterMovePacket.waypoints.First().ToString() + " };" + "\r\n";
+                                                output += "me->GetMotionMaster()->MoveSmoothFlyPath(ePoints::FlyEnd, Positions::g_" + ConverNameToCoreFormat(creatureName) + "FlyPos" + ");" + "\r\n";
+                                            }
+
                                             break;
                                         }
                                         default:

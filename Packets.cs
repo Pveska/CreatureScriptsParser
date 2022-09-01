@@ -714,6 +714,7 @@ namespace CreatureScriptsParser
             public MoveTypes moveType = MoveTypes.UNKNOWN;
             public List<Position> waypoints = new List<Position>();
             public Position startPosition;
+            public uint tierTransitionId;
 
             [Serializable]
             public struct JumpInfo
@@ -854,7 +855,7 @@ namespace CreatureScriptsParser
                     case MoveTypes.RUN:
                         return "me->SetSpeed(MOVE_RUN, " + GetSpeedRateString() + ", true);";
                     case MoveTypes.FLY:
-                        return "me->SetSpeed(MOVE_FLIGHT, " + GetSpeedRateString() + ", true);";
+                        return tierTransitionId == 0 ? "me->SetSpeed(MOVE_FLIGHT, " + GetSpeedRateString() + ", true);" : "me->SetSpeed(MOVE_RUN, " + GetSpeedRateString() + ", true);";
                     default:
                         return "";
                 }
@@ -917,6 +918,15 @@ namespace CreatureScriptsParser
             public float GetWaypointsVelocity()
             {
                 return GetWaypointsDistance() / moveTime * 1000;
+            }
+
+            public static uint GetTierTransitionIdFromLine(string line)
+            {
+                Regex tierTransitionIdRegex = new Regex(@"TierTransitionID:{1}\s+\d+");
+                if (tierTransitionIdRegex.IsMatch(line))
+                    return Convert.ToUInt32(tierTransitionIdRegex.Match(line).ToString().Replace("TierTransitionID: ", ""));
+
+                return 0;
             }
 
             public static MonsterMovePacket ParseMovementPacket(string[] lines, Packet packet)
@@ -990,6 +1000,9 @@ namespace CreatureScriptsParser
                                 movePacket.waypoints.Add(lastPosition);
                             }
                         }
+
+                        else if (GetTierTransitionIdFromLine(lines[x]) != 0)
+                            movePacket.tierTransitionId = GetTierTransitionIdFromLine(lines[x]);
                     }
                 }
 
