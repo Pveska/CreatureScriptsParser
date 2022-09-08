@@ -379,7 +379,7 @@ namespace CreatureScriptsParser
                                                 if (monsterMovePacket.waypoints.First().x == monsterMovePacket.startPosition.x && monsterMovePacket.waypoints.First().y == monsterMovePacket.startPosition.y)
                                                 {
                                                     float distance = monsterMovePacket.waypoints.First().z - monsterMovePacket.startPosition.z;
-                                                    string distanceStr = distance.ToString().Length > 1 ? distance.GetValueWithoutComma() : distance.ToString() + ".0f";
+                                                    string distanceStr = distance.ToString().Length > 1 ? distance.GetValueWithoutComma() + ".0f" : distance.ToString() + ".0f";
                                                     output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}MoveUpEnd,  {distanceStr}, {monsterMovePacket.tierTransitionId});" + "\r\n";
                                                 }
                                                 else
