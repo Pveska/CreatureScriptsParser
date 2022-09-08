@@ -15,7 +15,7 @@ namespace CreatureScriptsParser
             if (value.ToString().Length > 1)
                 return value.ToString().Replace(",", ".");
             else
-                return value.ToString() + "0.f";
+                return value.ToString() + ".0f";
         }
 
         public static string GetValueWithoutComma(this float value)
