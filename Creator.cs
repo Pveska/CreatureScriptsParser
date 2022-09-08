@@ -328,6 +328,34 @@ namespace CreatureScriptsParser
 
                                 output += monsterMovePacket.GetSetSpeedString() + "\r\n";
 
+                                if (monsterMovePacket.splineFilter.filled)
+                                {
+                                    output += "\r\n";
+                                    output += "Movement::MonsterSplineFilter l_SplineFilter;\r\n";
+                                    output += $"l_SplineFilter.BaseSpeed = {monsterMovePacket.splineFilter.baseSpeed.Value.GetFloatValueInCoreFormat()};\r\n";
+                                    output += $"l_SplineFilter.StartOffset = {monsterMovePacket.splineFilter.startOffset};\r\n";
+                                    output += $"l_SplineFilter.DistToPrevFilterKey = {monsterMovePacket.splineFilter.distToPrevFilterKey.Value.GetFloatValueInCoreFormat()};\r\n";
+                                    output += $"l_SplineFilter.AddedToStart = {monsterMovePacket.splineFilter.addedToStart};\r\n";
+                                    output += $"l_SplineFilter.FilterFlags = {monsterMovePacket.splineFilter.filterFlags};\r\n\r\n";
+
+                                    output += "l_SplineFilter.FilterKeys =\r\n";
+                                    output += "{\r\n";
+
+                                    foreach (MonsterMovePacket.MonsterSplineFilterKey splineKey in monsterMovePacket.splineFilter.filterKeys)
+                                    {
+                                        if (monsterMovePacket.splineFilter.filterKeys.IndexOf(splineKey) == monsterMovePacket.splineFilter.filterKeys.Count - 1)
+                                        {
+                                            output += $"{AddSpacesCount(4)}Movement::MonsterSplineFilterKey({splineKey.idx}, {splineKey.speed})\r\n";
+                                        }
+                                        else
+                                        {
+                                            output += $"{AddSpacesCount(4)}Movement::MonsterSplineFilterKey({splineKey.idx}, {splineKey.speed}),\r\n";
+                                        }
+                                    }
+
+                                    output += "};\r\n\r\n";
+                                }
+
                                 if (monsterMovePacket.waypoints.Count() == 1)
                                 {
                                     switch (monsterMovePacket.moveType)
@@ -378,23 +406,48 @@ namespace CreatureScriptsParser
                                     {
                                         case MonsterMovePacket.MoveTypes.WALK:
                                         {
-                                            output += "me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ", true);" + "\r\n";
+                                            if (monsterMovePacket.splineFilter.filled)
+                                            {
+                                                output += $"me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path{ConverNameToCoreFormat(creatureName)}, true, 0, $l_SplineFilter);\r\n";
+                                            }
+                                            else
+                                            {
+                                                output += "me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ", true);" + "\r\n";
+                                            }
+
                                             break;
                                         }
                                         case MonsterMovePacket.MoveTypes.RUN:
                                         {
-                                            output += "me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ", false);" + "\r\n";
+                                            if (monsterMovePacket.splineFilter.filled)
+                                            {
+                                                output += $"me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path{ConverNameToCoreFormat(creatureName)}, false, 0, $l_SplineFilter);\r\n";
+                                            }
+                                            else
+                                            {
+                                                output += "me->GetMotionMaster()->MoveSmoothPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ", false);" + "\r\n";
+                                            }
+
                                             break;
                                         }
                                         case MonsterMovePacket.MoveTypes.FLY:
                                         {
-                                            output += "me->GetMotionMaster()->MoveSmoothFlyPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ");" + "\r\n";
+                                            if (monsterMovePacket.splineFilter.filled)
+                                            {
+                                                output += $"me->GetMotionMaster()->MoveSmoothFlyPath(ePoints::MoveEnd, Waypoints::g_Path{ConverNameToCoreFormat(creatureName)}, 0, 0, $l_SplineFilter);\r\n";
+                                            }
+                                            else
+                                            {
+                                                output += "me->GetMotionMaster()->MoveSmoothFlyPath(ePoints::MoveEnd, Waypoints::g_Path" + ConverNameToCoreFormat(creatureName) + ");" + "\r\n";
+                                            }
+
                                             break;
                                         }
                                         default:
                                             break;
                                     }
 
+                                    output += "\r\n";
                                     output += "std::vector<G3D::Vector3> const g_Path" + ConverNameToCoreFormat(creatureName) + " =" + "\r\n";
                                     output += "{" + "\r\n";
 

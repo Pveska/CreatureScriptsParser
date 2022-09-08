@@ -715,6 +715,7 @@ namespace CreatureScriptsParser
             public List<Position> waypoints = new List<Position>();
             public Position startPosition;
             public uint tierTransitionId;
+            public MonsterSplineFilter splineFilter = new MonsterSplineFilter();
 
             [Serializable]
             public struct JumpInfo
@@ -733,11 +734,30 @@ namespace CreatureScriptsParser
 
             public enum MoveTypes
             {
-                WALK    = 1,
-                RUN     = 2,
-                FLY     = 3,
+                WALK = 1,
+                RUN = 2,
+                FLY = 3,
                 UNKNOWN = 4
             }
+
+            [Serializable]
+            public struct MonsterSplineFilterKey
+            {
+                public uint idx;
+                public uint speed;
+            };
+
+            [Serializable]
+            public struct MonsterSplineFilter
+            {
+                public List<MonsterSplineFilterKey?> filterKeys;
+                public uint? filterFlags;
+                public float? baseSpeed;
+                public uint? startOffset;
+                public float? distToPrevFilterKey;
+                public uint? addedToStart;
+                public bool filled;
+            };
 
             public MonsterMovePacket(PacketTypes type, TimeSpan time, long number) : base(type, time, number) { }
 
@@ -803,7 +823,7 @@ namespace CreatureScriptsParser
 
             public static bool? GetFlyingFromLine(string line)
             {
-                if (line.Contains("Flags:"))
+                if (line.Contains("Flags:") && !line.Contains("FilterFlags"))
                 {
                     if (line.Contains("Flying"))
                         return true;
@@ -929,6 +949,135 @@ namespace CreatureScriptsParser
                 return 0;
             }
 
+            public static float? GetBaseSpeedFromLine(string line)
+            {
+                Regex baseSpeedFloatRegex = new Regex(@"BaseSpeed:{1}\s+\d+\.+\d+");
+                if (baseSpeedFloatRegex.IsMatch(line))
+                    return float.Parse(baseSpeedFloatRegex.Match(line).ToString().Replace("BaseSpeed: ", ""), CultureInfo.InvariantCulture.NumberFormat);
+                else
+                {
+                    Regex baseSpeedIntRegex = new Regex(@"BaseSpeed:{1}\s+\d+");
+                    if (baseSpeedIntRegex.IsMatch(line))
+                        return float.Parse(baseSpeedIntRegex.Match(line).ToString().Replace("BaseSpeed: ", ""), CultureInfo.InvariantCulture.NumberFormat);
+                }
+
+                return null;
+            }
+
+
+            public static uint? GetStartOffsetFromLine(string line)
+            {
+                Regex startOffsetRegex = new Regex(@"StartOffset:{1}\s+\d+");
+                if (startOffsetRegex.IsMatch(line))
+                    return Convert.ToUInt32(startOffsetRegex.Match(line).ToString().Replace("StartOffset: ", ""));
+
+                return null;
+            }
+
+            public static float? GetDistToPrevFilterKeyFromLine(string line)
+            {
+                Regex distToPrevFilterKeyFloatRegex = new Regex(@"DistToPrevFilterKey:{1}\s+\d+\.+\d+");
+                if (distToPrevFilterKeyFloatRegex.IsMatch(line))
+                    return float.Parse(distToPrevFilterKeyFloatRegex.Match(line).ToString().Replace("DistToPrevFilterKey: ", ""), CultureInfo.InvariantCulture.NumberFormat);
+                else
+                {
+                    Regex distToPrevFilterKeyIntRegex = new Regex(@"DistToPrevFilterKey:{1}\s+\d+");
+                    if (distToPrevFilterKeyIntRegex.IsMatch(line))
+                        return float.Parse(distToPrevFilterKeyIntRegex.Match(line).ToString().Replace("DistToPrevFilterKey: ", ""), CultureInfo.InvariantCulture.NumberFormat);
+                }
+
+                return null;
+            }
+
+            public static uint? GetAddedToStartFromLine(string line)
+            {
+                Regex addedToStartRegex = new Regex(@"AddedToStart:{1}\s+\d+");
+                if (addedToStartRegex.IsMatch(line))
+                    return Convert.ToUInt32(addedToStartRegex.Match(line).ToString().Replace("AddedToStart: ", ""));
+
+                return null;
+            }
+
+            public static uint? GetFilterFlagsFromLine(string line)
+            {
+                Regex filterFlagsRegex = new Regex(@"FilterFlags:{1}\s+\d+");
+                if (filterFlagsRegex.IsMatch(line))
+                    return Convert.ToUInt32(filterFlagsRegex.Match(line).ToString().Replace("FilterFlags: ", ""));
+
+                return null;
+            }
+
+            public static MonsterSplineFilterKey? GetFilterKeyFromLine(string[] lines, long idx)
+            {
+                if (lines[idx].Contains("IDx"))
+                {
+                    MonsterSplineFilterKey monsterSplineFilterKey = new MonsterSplineFilterKey();
+
+                    Regex idxRegex = new Regex(@"IDx:{1}\s+\d+");
+                    Regex speedRegex = new Regex(@"Speed:{1}\s+\d+");
+
+                    if (idxRegex.IsMatch(lines[idx]))
+                        monsterSplineFilterKey.idx = Convert.ToUInt32(idxRegex.Match(lines[idx]).ToString().Replace("IDx: ", ""));
+
+                    if (speedRegex.IsMatch(lines[idx + 1]))
+                        monsterSplineFilterKey.speed = Convert.ToUInt32(speedRegex.Match(lines[idx + 1]).ToString().Replace("Speed: ", ""));
+
+                    return monsterSplineFilterKey;
+                }
+
+                return null;
+            }
+
+            public static void ParseSplineFlagsIfPossible(string[] lines, long idx, ref MonsterMovePacket movePacket)
+            {
+                if (movePacket.splineFilter.filled)
+                    return;
+
+                if (lines[idx].Contains("MonsterSplineFilter"))
+                {
+                    do
+                    {
+                        if (GetBaseSpeedFromLine(lines[idx]) != null)
+                        {
+                            movePacket.splineFilter.baseSpeed = GetBaseSpeedFromLine(lines[idx]);
+                        }
+                        else if (GetStartOffsetFromLine(lines[idx]) != null)
+                        {
+                            movePacket.splineFilter.startOffset = GetStartOffsetFromLine(lines[idx]);
+                        }
+                        else if (GetDistToPrevFilterKeyFromLine(lines[idx]) != null)
+                        {
+                            movePacket.splineFilter.distToPrevFilterKey = GetDistToPrevFilterKeyFromLine(lines[idx]);
+                        }
+                        else if (GetAddedToStartFromLine(lines[idx]) != null)
+                        {
+                            movePacket.splineFilter.addedToStart = GetAddedToStartFromLine(lines[idx]);
+                        }
+                        else if (GetFilterFlagsFromLine(lines[idx]) != null)
+                        {
+                            movePacket.splineFilter.filterFlags = GetFilterFlagsFromLine(lines[idx]);
+                        }
+                        else if (GetFilterKeyFromLine(lines, idx) != null)
+                        {
+                            if (movePacket.splineFilter.filterKeys == null)
+                            {
+                                movePacket.splineFilter.filterKeys = new List<MonsterSplineFilterKey?>();
+                                movePacket.splineFilter.filterKeys.Add(GetFilterKeyFromLine(lines, idx));
+                            }
+                            else
+                            {
+                                movePacket.splineFilter.filterKeys.Add(GetFilterKeyFromLine(lines, idx));
+                            }
+                        }
+
+                        idx++;
+                    }
+                    while (lines[idx].Contains("MonsterSplineFilter"));
+
+                    movePacket.splineFilter.filled = true;
+                }
+            }
+
             public static MonsterMovePacket ParseMovementPacket(string[] lines, Packet packet)
             {
                 MonsterMovePacket movePacket = new MonsterMovePacket(packet.type, packet.time, packet.number);
@@ -1003,6 +1152,8 @@ namespace CreatureScriptsParser
 
                         else if (GetTierTransitionIdFromLine(lines[x]) != 0)
                             movePacket.tierTransitionId = GetTierTransitionIdFromLine(lines[x]);
+
+                        ParseSplineFlagsIfPossible(lines, x, ref movePacket);
                     }
                 }
 

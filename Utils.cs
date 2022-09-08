@@ -10,6 +10,14 @@ namespace CreatureScriptsParser
 {
     public static class Utils
     {
+        public static string GetFloatValueInCoreFormat(this float value)
+        {
+            if (value.ToString().Length > 1)
+                return value.ToString().Replace(",", ".");
+            else
+                return value.ToString() + "0.f";
+        }
+
         public static string GetValueWithoutComma(this float value)
         {
             return value.ToString().Replace(",", ".");
