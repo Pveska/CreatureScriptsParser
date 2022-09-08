@@ -379,13 +379,14 @@ namespace CreatureScriptsParser
                                                 if (monsterMovePacket.waypoints.First().x == monsterMovePacket.startPosition.x && monsterMovePacket.waypoints.First().y == monsterMovePacket.startPosition.y)
                                                 {
                                                     float distance = monsterMovePacket.waypoints.First().z - monsterMovePacket.startPosition.z;
-                                                    string distanceStr = distance.ToString().Length > 1 ? distance.GetValueWithoutComma() + ".0f" : distance.ToString() + ".0f";
-                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}MoveUpEnd,  {distanceStr}, {monsterMovePacket.tierTransitionId});" + "\r\n";
+                                                    string moveType = monsterMovePacket.waypoints.First().z - monsterMovePacket.startPosition.z > 0.0f ? "MoveUpEnd" : "MoveDownEnd";
+                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}{moveType}, {distance.GetFloatValueInCoreFormat()}, {monsterMovePacket.tierTransitionId});" + "\r\n";
                                                 }
                                                 else
                                                 {
+                                                    string moveType = monsterMovePacket.waypoints.First().z - monsterMovePacket.startPosition.z > 0.0f ? "MoveUpEnd" : "MoveDownEnd";
                                                     output += $"Position const g_{ConverNameToCoreFormat(creatureName)}MoveUpPos = {{ {monsterMovePacket.waypoints.First()} }};" + "\r\n";
-                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}MoveUpEnd, g_{ConverNameToCoreFormat(creatureName)}MoveUpPos, {monsterMovePacket.tierTransitionId});" + "\r\n";
+                                                    output += $"me->GetMotionMaster()->MoveAnimTierTransition(ePoints::{ConverNameToCoreFormat(creatureName)}{moveType}, g_{ConverNameToCoreFormat(creatureName)}MoveUpPos, {monsterMovePacket.tierTransitionId});" + "\r\n";
                                                 }
                                             }
                                             else

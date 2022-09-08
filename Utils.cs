@@ -13,7 +13,7 @@ namespace CreatureScriptsParser
         public static string GetFloatValueInCoreFormat(this float value)
         {
             if (value.ToString().Length > 1 && value.ToString().Contains(","))
-                return value.ToString().Replace(",", ".");
+                return value.ToString().Replace(",", ".") + "f";
             else
                 return value.ToString() + ".0f";
         }
