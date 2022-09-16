@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static CreatureScriptsParser.Packets;
 
@@ -25,6 +26,16 @@ namespace CreatureScriptsParser
 
         public static string ConverNameToCoreFormat(string name)
         {
+            Regex lowCaseRegex = new Regex(@"\s+\w{1}");
+
+            foreach (Match match in lowCaseRegex.Matches(name))
+            {
+                if (char.IsLower(Convert.ToChar(match.Value.Replace(" ", ""))))
+                {
+                    name = name.Replace(match.Value, match.Value.Replace(match.Value[1].ToString(), match.Value[1].ToString().ToUpper()));
+                }
+            }
+
             return name.Replace("\'", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "");
         }
 
