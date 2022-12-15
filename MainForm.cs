@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CreatureScriptsParser
@@ -36,7 +29,7 @@ namespace CreatureScriptsParser
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 parsers = new Parsers(this);
-                Dbc.Dbc.Load();
+                DB2.Db2.Load();
 
                 if (openFileDialog.FileName.Contains("txt"))
                 {

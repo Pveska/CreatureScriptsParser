@@ -12,7 +12,7 @@ namespace CreatureScriptsParser
         {
             DataSet dataSet = new DataSet();
             MySqlConnection sqlConnection = new MySqlConnection();
-            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = world_shadowlands;";
+            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = world_dragonflight;";
             try
             {
                 sqlConnection.Open();
@@ -38,7 +38,7 @@ namespace CreatureScriptsParser
         {
             DataSet dataSet = new DataSet();
             MySqlConnection sqlConnection = new MySqlConnection();
-            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = hotfix_shadowlands;";
+            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = hotfix_dragonflight;";
             try
             {
                 sqlConnection.Open();
@@ -64,7 +64,7 @@ namespace CreatureScriptsParser
         {
             DataSet dataSet = new DataSet();
             MySqlConnection sqlConnection = new MySqlConnection();
-            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = spellwork;";
+            sqlConnection.ConnectionString = "server = localhost;" + " port = 3306;" + " user id = root;" + " password = root;" + " database = db2;";
             try
             {
                 sqlConnection.Open();

@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static CreatureScriptsParser.Packets;
 
 namespace CreatureScriptsParser
@@ -64,9 +63,9 @@ namespace CreatureScriptsParser
 
         public static string GetSpellName(uint spellId)
         {
-            if (Dbc.Dbc.SpellName.ContainsKey((int)spellId))
+            if (DB2.Db2.SpellName.ContainsKey((int)spellId))
             {
-                return Dbc.Dbc.SpellName[(int)spellId].Name;
+                return DB2.Db2.SpellName[(int)spellId].Name;
             }
 
             return "Unknown";
