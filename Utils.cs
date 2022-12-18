@@ -108,5 +108,26 @@ namespace CreatureScriptsParser
 
             return false;
         }
+
+        public static bool IsSoundRelatedToText(string text, uint soundId)
+        {
+            var query = Sql.WorldDatabaseSelectQuery("SELECT `sound` FROM `creature_text` WHERE `text` LIKE " + "'%" + text.Replace("'", "''") + "%'");
+
+            if (query.Tables["table"].Rows.Count != 0)
+            {
+                foreach (DataRow row in query.Tables["table"].Rows)
+                {
+                    foreach (var item in row.ItemArray)
+                    {
+                        if (item.ToString() == soundId.ToString())
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+        }
     }
 }

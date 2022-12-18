@@ -31,10 +31,11 @@ namespace CreatureScriptsParser
             creaturePacketsList.AddRange(packetsList.Where(x => x.GetType() == typeof(SpellStartPacket) && ((SpellStartPacket)x).guid != guid && ((SpellStartPacket)x).targetGuids != null && ((SpellStartPacket)x).targetGuids.Contains(guid)));
             AuraUpdatePacket.FilterAuraPacketsForCreature(creaturePacketsList);
             creaturePacketsList = creaturePacketsList.OrderBy(x => ((Packet)x).number).ToList();
+            List<object> creaturePacketsListCopy = new List<object>(creaturePacketsList);
 
-            for (int i = 0; i < creaturePacketsList.Count; i++)
+            for (int i = 0; i < creaturePacketsListCopy.Count; i++)
             {
-                Packet packet = (Packet)creaturePacketsList[i];
+                Packet packet = (Packet)creaturePacketsListCopy[i];
 
                 if (packet.type == Packet.PacketTypes.SMSG_EMOTE)
                 {
@@ -51,7 +52,24 @@ namespace CreatureScriptsParser
                     }
 
                     if (emoteRelatedToChat)
-                        creaturePacketsList.RemoveAt(i);
+                        creaturePacketsList.Remove(packet);
+                }
+                else if (packet.type == Packet.PacketTypes.SMSG_PLAY_OBJECT_SOUND)
+                {
+                    bool soundRelatedToChat = false;
+
+                    foreach (Packet chatPacket in creaturePacketsList.Where(x => x.GetType() == typeof(ChatPacket)))
+                    {
+                        if ((Math.Round(packet.time.TotalSeconds) == Math.Round(chatPacket.time.TotalSeconds) || Math.Round(packet.time.TotalSeconds) + 1 == Math.Round(chatPacket.time.TotalSeconds)) &&
+                            IsSoundRelatedToText(((ChatPacket)chatPacket).creatureText, ((PlayObjectSoundPacket)packet).SoundId))
+                        {
+                            soundRelatedToChat = true;
+                            break;
+                        }
+                    }
+
+                    if (soundRelatedToChat)
+                        creaturePacketsList.Remove(packet);
                 }
             }
 
