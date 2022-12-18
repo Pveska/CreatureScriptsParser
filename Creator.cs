@@ -250,6 +250,11 @@ namespace CreatureScriptsParser
                             {
                                 output += $"me->setFaction({updateObjectPacket.factionTemplate});" + "\r\n";
                             }
+
+                            if (updateObjectPacket.mountDisplayId != 0)
+                            {
+                                output += $"me->Mount({updateObjectPacket.mountDisplayId});" + "\r\n";
+                            }
                         }
                         else if (updateObjectPacket.updateType == UpdateObjectPacket.UpdateType.Destroy)
                         {

@@ -65,6 +65,7 @@ namespace CreatureScriptsParser
             public long? unitFlags2;
             public long? unitFlags3;
             public uint factionTemplate;
+            public uint mountDisplayId;
 
             public UpdateObjectPacket(PacketTypes packetType, TimeSpan time, long number, UpdateType updateType, ObjectType objectType) : base(packetType, time, number)
             { this.updateType = updateType; this.objectType = objectType; }
@@ -141,74 +142,74 @@ namespace CreatureScriptsParser
 
             public enum UnitFlags2 : long
             {
-                UNIT_FLAG2_FEIGN_DEATH                  = 0x00000001,
-                UNIT_FLAG2_UNK1                         = 0x00000002,
-                UNIT_FLAG2_IGNORE_REPUTATION            = 0x00000004,
-                UNIT_FLAG2_COMPREHEND_LANG              = 0x00000008,
-                UNIT_FLAG2_MIRROR_IMAGE                 = 0x00000010,
-                UNIT_FLAG2_INSTANTLY_APPEAR_MODEL       = 0x00000020,
-                UNIT_FLAG2_FORCE_MOVEMENT               = 0x00000040,
-                UNIT_FLAG2_DISARM_OFFHAND               = 0x00000080,
-                UNIT_FLAG2_DISABLE_PRED_STATS           = 0x00000100,
-                UNIT_FLAG2_ALLOW_CHANGING_TALENTS       = 0x00000200,
-                UNIT_FLAG2_DISARM_RANGED                = 0x00000400,
-                UNIT_FLAG2_REGENERATE_POWER             = 0x00000800,
-                UNIT_FLAG2_RESTRICT_PARTY_INTERACTION   = 0x00001000,
-                UNIT_FLAG2_PREVENT_SPELL_CLICK          = 0x00002000,
-                UNIT_FLAG2_ALLOW_ENEMY_INTERACT         = 0x00004000,
-                UNIT_FLAG2_DISABLE_TURN                 = 0x00008000,
-                UNIT_FLAG2_UNK2                         = 0x00010000,
-                UNIT_FLAG2_PLAY_DEATH_ANIM              = 0x00020000,
-                UNIT_FLAG2_ALLOW_CHEAT_SPELLS           = 0x00040000,
-                UNIT_FLAG2_NO_ACTIONS                   = 0x00080000,
-                UNIT_FLAG2_UNK4                         = 0x00100000,
-                UNIT_FLAG2_UNK5                         = 0x00200000,
-                UNIT_FLAG2_UNK6                         = 0x00400000,
-                UNIT_FLAG2_UNK7                         = 0x00800000,
-                UNIT_FLAG2_UNK8                         = 0x01000000,
-                UNIT_FLAG2_UPDATE_REACTION              = 0x02000000,
-                UNIT_FLAG2_SELECTION_DISABLED           = 0x04000000,
-                UNIT_FLAG2_UNK11                        = 0x08000000,
-                UNIT_FLAG2_UNK12                        = 0x10000000,
-                UNIT_FLAG2_UNK13                        = 0x20000000,
-                UNIT_FLAG2_UNK14                        = 0x40000000,
-                UNIT_FLAG2_UNK15                        = 0x80000000
+                UNIT_FLAG2_FEIGN_DEATH                                     = 0x00000001,
+                UNIT_FLAG2_HIDE_BODY                                       = 0x00000002,
+                UNIT_FLAG2_IGNORE_REPUTATION                               = 0x00000004,
+                UNIT_FLAG2_COMPREHEND_LANG                                 = 0x00000008,
+                UNIT_FLAG2_MIRROR_IMAGE                                    = 0x00000010,
+                UNIT_FLAG2_INSTANTLY_DONT_FADE_IN                          = 0x00000020,
+                UNIT_FLAG2_FORCE_MOVEMENT                                  = 0x00000040,
+                UNIT_FLAG2_DISARM_OFFHAND                                  = 0x00000080,
+                UNIT_FLAG2_DISABLE_PRED_STATS                              = 0x00000100,
+                UNIT_FLAG2_ALLOW_CHANGING_TALENTS                          = 0x00000200,
+                UNIT_FLAG2_DISARM_RANGED                                   = 0x00000400,
+                UNIT_FLAG2_REGENERATE_POWER                                = 0x00000800,
+                UNIT_FLAG2_RESTRICT_PARTY_INTERACTION                      = 0x00001000,
+                UNIT_FLAG2_PREVENT_SPELL_CLICK                             = 0x00002000,
+                UNIT_FLAG2_INTERACT_WHILE_HOSTILE                          = 0x00004000,
+                UNIT_FLAG2_CANNOT_TURN                                     = 0x00008000,
+                UNIT_FLAG2_UNK2                                            = 0x00010000,
+                UNIT_FLAG2_PLAY_DEATH_ANIM                                 = 0x00020000,
+                UNIT_FLAG2_ALLOW_CHEAT_SPELLS                              = 0x00040000,
+                UNIT_FLAG2_SUPPRESS_HIGHLIGHT_WHEN_TARGETED_OR_MOUSED_OVER = 0x00080000,
+                UNIT_FLAG2_TREAT_AS_RAID_UNIT_FOR_HELPFUL_SPELLS           = 0x00100000,
+                UNIT_FLAG2_LARGE_AOI                                       = 0x00200000,
+                UNIT_FLAG2_GIGANTIC_AOI                                    = 0x00400000,
+                UNIT_FLAG2_NO_ACTIONS                                      = 0x00800000,
+                UNIT_FLAG2_AI_WILL_ONLY_SWIM_IF_TARGET_SWIMS               = 0x01000000,
+                UNIT_FLAG2_DONT_GENERATE_COMBAT_LOG_WHEN_ENGAGED_WITH_NPCS = 0x02000000,
+                UNIT_FLAG2_UNTARGETABLE_BY_CLIENT                          = 0x04000000,
+                UNIT_FLAG2_ATTACKER_IGNORES_MINIMUM_RANGES                 = 0x08000000,
+                UNIT_FLAG2_UNINTERACTIBLE_IF_HOSTILE                       = 0x10000000,
+                UNIT_FLAG2_UNK13                                           = 0x20000000,
+                UNIT_FLAG2_INFINITE_AOI                                    = 0x40000000,
+                UNIT_FLAG2_UNK15                                           = 0x80000000
             };
 
             public enum UnitFlags3 : long
             {
-                UNIT_FLAG3_PASSIVE_AI                   = 0x00000001,
-                UNIT_FLAG3_UNK2                         = 0x00000002,
-                UNIT_FLAG3_CAN_FIGHT_WITHOUT_DISMOUNT   = 0x00000004,
-                UNIT_FLAG3_UNK4                         = 0x00000008,
-                UNIT_FLAG3_UNK5                         = 0x00000010,
-                UNIT_FLAG3_UNK6                         = 0x00000020,
-                UNIT_FLAG3_UNK7                         = 0x00000040,
-                UNIT_FLAG3_UNK8                         = 0x00000080,
-                UNIT_FLAG3_UNK9                         = 0x00000100,
-                UNIT_FLAG3_UNK10                        = 0x00000200,
-                UNIT_FLAG3_UNK11                        = 0x00000400,
-                UNIT_FLAG3_UNK12                        = 0x00000800,
-                UNIT_FLAG3_UNK13                        = 0x00001000,
-                UNIT_FLAG3_DISPLAY_AS_CORPSE            = 0x00002000,
-                UNIT_FLAG3_UNK15                        = 0x00004000,
-                UNIT_FLAG3_UNK16                        = 0x00008000,
-                UNIT_FLAG3_UNK17                        = 0x00010000,
-                UNIT_FLAG3_ALREADY_MINED_OR_SKINNED     = 0x00020000,
-                UNIT_FLAG3_UNK19                        = 0x00040000,
-                UNIT_FLAG3_UNK20                        = 0x00080000,
-                UNIT_FLAG3_UNK21                        = 0x00100000,
-                UNIT_FLAG3_UNK22                        = 0x00200000,
-                UNIT_FLAG3_UNK23                        = 0x00400000,
-                UNIT_FLAG3_UNK24                        = 0x00800000,
-                UNIT_FLAG3_UNK25                        = 0x01000000,
-                UNIT_FLAG3_UNK26                        = 0x02000000,
-                UNIT_FLAG3_UNK27                        = 0x04000000,
-                UNIT_FLAG3_UNK28                        = 0x08000000,
-                UNIT_FLAG3_UNK29                        = 0x10000000,
-                UNIT_FLAG3_UNK30                        = 0x20000000,
-                UNIT_FLAG3_UNK31                        = 0x40000000,
-                UNIT_FLAG3_UNK32                        = 0x80000000
+                UNIT_FLAG3_PASSIVE_AI                                  = 0x00000001,
+                UNIT_FLAG3_UNCONSCIOUS_ON_DEATH                        = 0x00000002,
+                UNIT_FLAG3_ALLOW_MOUNTED_COMBAT                        = 0x00000004,
+                UNIT_FLAG3_GARRISON_PET                                = 0x00000008,
+                UNIT_FLAG3_UI_CAN_GET_POSITION                         = 0x00000010,
+                UNIT_FLAG3_AI_OBSTACLE                                 = 0x00000020,
+                UNIT_FLAG3_ALTERNATIVE_DEFAULT_LANGUAGE                = 0x00000040,
+                UNIT_FLAG3_SUPPRESS_ALL_NPC_FEEDBACK                   = 0x00000080,
+                UNIT_FLAG3_IGNORE_COMBAT                               = 0x00000100,
+                UNIT_FLAG3_SUPPRESS_NPC_FEEDBACK                       = 0x00000200,
+                UNIT_FLAG3_UNK11                                       = 0x00000400,
+                UNIT_FLAG3_UNK12                                       = 0x00000800,
+                UNIT_FLAG3_UNK13                                       = 0x00001000,
+                UNIT_FLAG3_FAKE_DEAD                                   = 0x00002000,
+                UNIT_FLAG3_NO_FACING_ON_INTERACT_AND_FAST_FACING_CHASE = 0x00004000,
+                UNIT_FLAG3_UNTARGETABLE_FROM_UI                        = 0x00008000,
+                UNIT_FLAG3_NO_FACING_ON_INTERACT_WHILE_FAKE_DEAD       = 0x00010000,
+                UNIT_FLAG3_ALREADY_SKINNED                             = 0x00020000,
+                UNIT_FLAG3_SUPPRESS_ALL_NPC_SOUNDS                     = 0x00040000,
+                UNIT_FLAG3_SUPPRESS_NPC_SOUNDS                         = 0x00080000,
+                UNIT_FLAG3_UNK21                                       = 0x00100000,
+                UNIT_FLAG3_UNK22                                       = 0x00200000,
+                UNIT_FLAG3_DONT_FADE_OUT                               = 0x00400000,
+                UNIT_FLAG3_UNK24                                       = 0x00800000,
+                UNIT_FLAG3_HIDE_NAMEPLATE                              = 0x01000000,
+                UNIT_FLAG3_UNK26                                       = 0x02000000,
+                UNIT_FLAG3_UNK27                                       = 0x04000000,
+                UNIT_FLAG3_UNK28                                       = 0x08000000,
+                UNIT_FLAG3_UNK29                                       = 0x10000000,
+                UNIT_FLAG3_UNK30                                       = 0x20000000,
+                UNIT_FLAG3_UNK31                                       = 0x40000000,
+                UNIT_FLAG3_UNK32                                       = 0x80000000
             };
 
             public static bool IsLineValidForObjectParse(string line)
@@ -369,6 +370,15 @@ namespace CreatureScriptsParser
                 return null;
             }
 
+            public static uint GetMountDisplayIdFromLine(string line)
+            {
+                Regex mountTemplateRegex = new Regex(@"\(UnitData\) MountDisplayID:{1}\s{1}\w+");
+                if (mountTemplateRegex.IsMatch(line))
+                    return Convert.ToUInt32(mountTemplateRegex.Match(line).ToString().Replace("(UnitData) MountDisplayID: ", ""));
+
+                return 0;
+            }
+
             public static uint GetFactionTemplateFromLine(string line)
             {
                 Regex factionTemplateRegex = new Regex(@"\(UnitData\) FactionTemplate:{1}\s{1}\w+");
@@ -487,6 +497,9 @@ namespace CreatureScriptsParser
 
                             else if (GetFactionTemplateFromLine(lines[index]) != 0)
                                 updatePacket.factionTemplate = GetFactionTemplateFromLine(lines[index]);
+
+                            else if (GetMountDisplayIdFromLine(lines[index]) != 0)
+                                updatePacket.mountDisplayId = GetMountDisplayIdFromLine(lines[index]);
                         });
 
                         if (updatePacket.guid != "" && (updatePacket.emoteStateId != null || updatePacket.sheatheState != null ||
