@@ -504,7 +504,7 @@ namespace CreatureScriptsParser
 
                         if (updatePacket.guid != "" && (updatePacket.emoteStateId != null || updatePacket.sheatheState != null ||
                             updatePacket.standState != null || updatePacket.unitFlags != null || updatePacket.unitFlags2 != null ||
-                            updatePacket.unitFlags3 != null || updatePacket.factionTemplate != 0))
+                            updatePacket.unitFlags3 != null || updatePacket.factionTemplate != 0 || updatePacket.mountDisplayId != null))
                         {
                             updatePacketsList.Add(updatePacket);
                         }
