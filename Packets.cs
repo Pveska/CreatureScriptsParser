@@ -1692,7 +1692,8 @@ namespace CreatureScriptsParser
             public uint? slot;
             public uint spellId;
             public UpdateType updateType;
-            public bool? hasDuration;
+            public uint duration;
+            public long linkedPacketNumber;
 
             public enum UpdateType
             {
@@ -1720,13 +1721,13 @@ namespace CreatureScriptsParser
                 return null;
             }
 
-            public static bool? GetHasDurationFromLine(string line)
+            public static uint GetDurationFromLine(string line)
             {
-                Regex hasDurationRegex = new Regex(@"HasDuration:{1}\s{1}\w+");
-                if (hasDurationRegex.IsMatch(line))
-                    return hasDurationRegex.Match(line).ToString().Replace("HasDuration: ", "") == "True";
+                Regex slotRegex = new Regex(@"Duration:{1}\s{1}\d+");
+                if (slotRegex.IsMatch(line))
+                    return Convert.ToUInt32(slotRegex.Match(line).ToString().Replace("Duration: ", ""));
 
-                return null;
+                return 0;
             }
 
             public static bool IsLineValidForAuraUpdateParsing(string line)
@@ -1764,11 +1765,11 @@ namespace CreatureScriptsParser
                             else if (GetHasAuraFromLine(lines[index]) != null)
                                 auraUpdatePacket.updateType = GetHasAuraFromLine(lines[index]).ToString() == "True" ? UpdateType.AddAura : UpdateType.RemoveAura;
 
-                            else if (GetHasDurationFromLine(lines[index]) != null)
-                                auraUpdatePacket.hasDuration = GetHasDurationFromLine(lines[index]);
-
                             else if (SpellStartPacket.GetSpellIdFromLine(lines[index]) != 0)
                                 auraUpdatePacket.spellId = SpellStartPacket.GetSpellIdFromLine(lines[index]);
+
+                            else if (GetDurationFromLine(lines[index]) != 0)
+                                auraUpdatePacket.duration = GetDurationFromLine(lines[index]);
                         });
 
                         aurasCollection.Add(auraUpdatePacket);
@@ -1780,20 +1781,22 @@ namespace CreatureScriptsParser
 
             public static void FilterAuraPacketsForCreature(List<object> creaturePackets)
             {
-                List<object> sortedAuraPacketList = creaturePackets.Where(x => x.GetType() == typeof(AuraUpdatePacket)).OrderBy(x => ((Packet)x).number).ToList();
+                List<object> sortedAuraPackestList = creaturePackets.Where(x => x.GetType() == typeof(AuraUpdatePacket)).OrderBy(x => ((Packet)x).number).ToList();
+                List<object> outputAuraRemovePacketsList = new List<object>();
 
-                for (int i = 0; i < sortedAuraPacketList.Count(); i++)
+                for (int i = 0; i < sortedAuraPackestList.Count(); i++)
                 {
-                    AuraUpdatePacket addAuraPacket = (AuraUpdatePacket)sortedAuraPacketList[i];
+                    AuraUpdatePacket addAuraPacket = (AuraUpdatePacket)sortedAuraPackestList[i];
 
-                    if (addAuraPacket.updateType == UpdateType.AddAura && addAuraPacket.hasDuration == false)
+                    if (addAuraPacket.updateType == UpdateType.AddAura)
                     {
-                        for (int j = i + 1; j < sortedAuraPacketList.Count(); j++)
+                        for (int j = i + 1; j < sortedAuraPackestList.Count(); j++)
                         {
-                            AuraUpdatePacket removeAuraPacket = (AuraUpdatePacket)sortedAuraPacketList[j];
+                            AuraUpdatePacket removeAuraPacket = (AuraUpdatePacket)sortedAuraPackestList[j];
 
                             if (removeAuraPacket.updateType == UpdateType.RemoveAura && removeAuraPacket.slot == addAuraPacket.slot)
                             {
+                                removeAuraPacket.linkedPacketNumber = addAuraPacket.number;
                                 removeAuraPacket.spellId = addAuraPacket.spellId;
                                 break;
                             }
@@ -1801,9 +1804,18 @@ namespace CreatureScriptsParser
                     }
                 }
 
-                creaturePackets.RemoveAll(x => x.GetType() == typeof(AuraUpdatePacket));
+                for (int i = 0; i < sortedAuraPackestList.Count(); i++)
+                {
+                    AuraUpdatePacket addAuraPacket = (AuraUpdatePacket)sortedAuraPackestList[i];
+                    AuraUpdatePacket removeAuraPacket = (AuraUpdatePacket)sortedAuraPackestList.FirstOrDefault(x => ((AuraUpdatePacket)x).linkedPacketNumber == addAuraPacket.number);
+                    if (removeAuraPacket != null && (addAuraPacket.duration == 0 || addAuraPacket.duration > (uint)(removeAuraPacket.time - addAuraPacket.time).TotalMilliseconds))
+                    {
+                        outputAuraRemovePacketsList.Add(removeAuraPacket);
+                    }
+                }
 
-                creaturePackets.AddRange(sortedAuraPacketList.Where(x => ((AuraUpdatePacket)x).updateType == UpdateType.RemoveAura && ((AuraUpdatePacket)x).spellId != 0).ToList());
+                creaturePackets.RemoveAll(x => x.GetType() == typeof(AuraUpdatePacket));
+                creaturePackets.AddRange(outputAuraRemovePacketsList);
             }
         }
 
