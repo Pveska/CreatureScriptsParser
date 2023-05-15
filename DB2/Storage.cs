@@ -82,7 +82,7 @@ namespace DB2Storage
                                 else if (lFieldType == typeof(Int32) || lFieldType == typeof(int?))
                                 {
                                     if (!WorldStorage)
-                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt32(BitConverter.GetBytes(lReader.GetUInt32(lI)), 0));
+                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt32(BitConverter.GetBytes(lReader.GetInt32(lI)), 0));
                                     else
                                         lFieldsInfo[lFieldIndex].SetValue(lRow, lReader.GetInt32(lI));
                                 }
@@ -93,7 +93,7 @@ namespace DB2Storage
                                 else if (lFieldType == typeof(Int16))
                                 {
                                     if (!WorldStorage)
-                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetUInt16(lI)), 0));
+                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetInt16(lI)), 0));
                                     else
                                         lFieldsInfo[lFieldIndex].SetValue(lRow, lReader.GetInt16(lI));
                                 }
@@ -107,7 +107,7 @@ namespace DB2Storage
                                 else if (lFieldType == typeof(Int64))
                                 {
                                     if (!WorldStorage)
-                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt64(BitConverter.GetBytes(lReader.GetUInt64(lI)), 0));
+                                        lFieldsInfo[lFieldIndex].SetValue(lRow, BitConverter.ToInt64(BitConverter.GetBytes(lReader.GetInt64(lI)), 0));
                                     else
                                         lFieldsInfo[lFieldIndex].SetValue(lRow, lReader.GetInt64(lI));
                                 }
@@ -121,7 +121,7 @@ namespace DB2Storage
                                 else if (lFieldType == typeof(sbyte))
                                 {
                                     if (!WorldStorage)
-                                        lFieldsInfo[lFieldIndex].SetValue(lRow, (sbyte)BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetByte(lI)), 0));
+                                        lFieldsInfo[lFieldIndex].SetValue(lRow, (sbyte)BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetSByte(lI)), 0));
                                     else
                                         lFieldsInfo[lFieldIndex].SetValue(lRow, lReader.GetSByte(lI));
                                 }
@@ -139,13 +139,13 @@ namespace DB2Storage
                                             lArray.SetValue(lReader.GetUInt32(lI), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(Int32))
-                                            lArray.SetValue(BitConverter.ToInt32(BitConverter.GetBytes(lReader.GetUInt32(lI)), 0), lArrayIndex);
+                                            lArray.SetValue(BitConverter.ToInt32(BitConverter.GetBytes(lReader.GetInt32(lI)), 0), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(UInt16))
                                             lArray.SetValue(lReader.GetUInt16(lI), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(Int16))
-                                            lArray.SetValue(BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetUInt16(lI)), 0), lArrayIndex);
+                                            lArray.SetValue(BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetInt16(lI)), 0), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(float))
                                             lArray.SetValue(lReader.GetFloat(lI), lArrayIndex);
@@ -154,13 +154,13 @@ namespace DB2Storage
                                             lArray.SetValue(lReader.GetUInt64(lI), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(Int64))
-                                            lArray.SetValue(BitConverter.ToInt64(BitConverter.GetBytes(lReader.GetUInt64(lI)), 0), lArrayIndex);
+                                            lArray.SetValue(BitConverter.ToInt64(BitConverter.GetBytes(lReader.GetInt64(lI)), 0), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(byte))
                                             lArray.SetValue(lReader.GetByte(lI), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(sbyte))
-                                            lArray.SetValue((sbyte)BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetByte(lI)), 0), lArrayIndex);
+                                            lArray.SetValue((sbyte)BitConverter.ToInt16(BitConverter.GetBytes(lReader.GetSByte(lI)), 0), lArrayIndex);
 
                                         else if (lArray.GetType().GetElementType() == typeof(string))
                                             lArray.SetValue(lReader.GetString(lI), lArrayIndex);
@@ -189,14 +189,18 @@ namespace DB2Storage
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.InnerException);
+                    MessageBox.Show("Table " + lTableName + " structure error! Error: " + e.Message);
                 }
 
                 if (Count == 0)
                     MessageBox.Show($"Table {lTableName} is empty!");
             }
+
+            lConnection.Close();
+            lConnection.Dispose();
         }
     }
+
     public class MySqlStorage<T> : MySqlStorageBase<T>
     {
         public MySqlStorage()

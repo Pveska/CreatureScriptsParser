@@ -21,7 +21,7 @@ namespace DB2
 
     public static class Db2
     {
-        public static MySqlStorage<SpellName>                       SpellName { get; set; }
+        public static MySqlStorage<SpellName> SpellName { get; set; }
 
         public static void Load()
         {
