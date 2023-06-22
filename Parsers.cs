@@ -290,6 +290,17 @@ namespace CreatureScriptsParser
 
                         break;
                     }
+                    case Packet.PacketTypes.SMSG_PLAY_SPELL_VISUAL:
+                    {
+                        PlaySpellVisual playSpellVisualPacket = PlaySpellVisual.ParsePlaySpellVisualPacket(lines, packet);
+
+                        if (playSpellVisualPacket.guid != "")
+                        {
+                            packetsList.Add(playSpellVisualPacket);
+                        }
+
+                        break;
+                    }
                     default:
                         break;
                 }

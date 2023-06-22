@@ -42,7 +42,8 @@ namespace CreatureScriptsParser
                 SMSG_AURA_UPDATE,
                 SMSG_SET_AI_ANIM_KIT,
                 SMSG_PLAY_SPELL_VISUAL_KIT,
-                SMSG_PLAY_OBJECT_SOUND
+                SMSG_PLAY_OBJECT_SOUND,
+                SMSG_PLAY_SPELL_VISUAL
             }
         }
 
@@ -1951,6 +1952,108 @@ namespace CreatureScriptsParser
                 });
 
                 return soundPacket;
+            }
+        }
+
+        [Serializable]
+        public class PlaySpellVisual : Packet
+        {
+            public bool targetIsPlayer;
+            public Position targetPosition;
+            public uint SpellVisualId;
+            public uint? TravelSpeed;
+            public uint? LaunchDelay;
+            public bool? SpeedAsTime;
+
+            public PlaySpellVisual(PacketTypes type, TimeSpan time, long number) : base(type, time, number) { }
+
+            public static Position GetTargetPositionFromLine(string line)
+            {
+                Position position = new Position();
+
+                Regex xyzRegex = new Regex(@"TargetPosition:{1}\s{1}X:{1}.+");
+                if (xyzRegex.IsMatch(line))
+                {
+                    string[] splittedLine = xyzRegex.Match(line).ToString().Replace("TargetPosition: X: ", "").Split(' ');
+
+                    position.x = float.Parse(splittedLine[0], CultureInfo.InvariantCulture.NumberFormat);
+                    position.y = float.Parse(splittedLine[2], CultureInfo.InvariantCulture.NumberFormat);
+                    position.z = float.Parse(splittedLine[4], CultureInfo.InvariantCulture.NumberFormat);
+                }
+
+                return position;
+            }
+
+            public static uint GetSpellVisualIdFromLine(string line)
+            {
+                Regex spellVisualIdRegex = new Regex(@"SpellVisualID:{1}\s+\d+");
+                if (spellVisualIdRegex.IsMatch(line))
+                    return Convert.ToUInt32(spellVisualIdRegex.Match(line).ToString().Replace("SpellVisualID: ", ""));
+
+                return 0;
+            }
+
+            public static uint? GetTravelSpeedFromLine(string line)
+            {
+                Regex travelSpeedRegex = new Regex(@"TravelSpeed:{1}\s+\d+");
+                if (travelSpeedRegex.IsMatch(line))
+                    return Convert.ToUInt32(travelSpeedRegex.Match(line).ToString().Replace("TravelSpeed: ", ""));
+
+                return null;
+            }
+
+            public static uint? GetLaunchDelayFromLine(string line)
+            {
+                Regex launchDelayRegex = new Regex(@"LaunchDelay:{1}\s+\d+");
+                if (launchDelayRegex.IsMatch(line))
+                    return Convert.ToUInt32(launchDelayRegex.Match(line).ToString().Replace("LaunchDelay: ", ""));
+
+                return null;
+            }
+
+            public static bool? GetSpeedAsTimeFromLine(string line)
+            {
+                Regex durationRegexRegex = new Regex(@"SpeedAsTime:{1}\s{1}\w+");
+                if (durationRegexRegex.IsMatch(line))
+                    return !line.Contains("False");
+
+                return null;
+            }
+
+            public static PlaySpellVisual ParsePlaySpellVisualPacket(string[] lines, Packet packet)
+            {
+                PlaySpellVisual spellVisualPacket = new PlaySpellVisual(packet.type, packet.time, packet.number);
+
+                if (LineGetters.IsCreatureLine(lines[packet.startIndex + 1]))
+                {
+                    Parallel.For(packet.startIndex, packet.endIndex, x =>
+                    {
+                        if (lines[x].Contains("Target: TypeName:"))
+                        {
+                            spellVisualPacket.targetIsPlayer = lines[x].Contains("Target: TypeName: Player;");
+                        }
+
+                        else if (GetTargetPositionFromLine(lines[x]).IsValid())
+                            spellVisualPacket.targetPosition = GetTargetPositionFromLine(lines[x]);
+
+                        else if (LineGetters.GetGuidFromLine(lines[x], sourceGuid: true) != "")
+                            spellVisualPacket.guid = LineGetters.GetGuidFromLine(lines[x], sourceGuid: true);
+
+                        else if (GetSpellVisualIdFromLine(lines[x]) != 0)
+                            spellVisualPacket.SpellVisualId = GetSpellVisualIdFromLine(lines[x]);
+
+                        else if (GetTravelSpeedFromLine(lines[x]) != null)
+                            spellVisualPacket.TravelSpeed = GetTravelSpeedFromLine(lines[x]);
+
+                        else if (GetLaunchDelayFromLine(lines[x]) != null)
+                            spellVisualPacket.LaunchDelay = GetLaunchDelayFromLine(lines[x]);
+
+                        else if (GetSpeedAsTimeFromLine(lines[x]) != null)
+                            spellVisualPacket.SpeedAsTime = GetSpeedAsTimeFromLine(lines[x]);
+                    });
+                }
+
+                return spellVisualPacket;
             }
         }
     }

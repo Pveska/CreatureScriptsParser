@@ -563,6 +563,15 @@ namespace CreatureScriptsParser
 
                         break;
                     }
+                    case Packet.PacketTypes.SMSG_PLAY_SPELL_VISUAL:
+                    {
+                        PlaySpellVisual playSpellVisualPacket = (PlaySpellVisual)packet;
+                        string target = playSpellVisualPacket.targetIsPlayer ? "p_Player" : "p_Creature";
+                        string speedAsTime = (bool)playSpellVisualPacket.SpeedAsTime ? "true" : "false";
+
+                        output += $"me->SendPlaySpellVisual({playSpellVisualPacket.SpellVisualId}, {target}, {playSpellVisualPacket.TravelSpeed}, Position({playSpellVisualPacket.targetPosition}), {speedAsTime}, {playSpellVisualPacket.LaunchDelay});" + "\r\n";
+                        break;
+                    }
                     default:
                         break;
                 }
