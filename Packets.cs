@@ -395,7 +395,7 @@ namespace CreatureScriptsParser
 
                 foreach(var itr in packet.indexes)
                 {
-                    if ((lines[itr.Key].Contains("UpdateType: 1 (CreateObject1)") || lines[itr.Key].Contains("UpdateType: 2 (CreateObject2)")) && lines[itr.Key + 1].IsCreatureLine())
+                    if ((lines[itr.Key].Contains("UpdateType: CreateObject1") || lines[itr.Key].Contains("UpdateType: CreateObject2")) && lines[itr.Key + 1].IsCreatureLine())
                     {
                         UpdateObjectPacket updatePacket = new UpdateObjectPacket(packet.type, packet.time, packet.number, UpdateType.CreateObject, ObjectType.Creature);
                         updatePacket.moveData = new MonsterMovePacket(PacketTypes.SMSG_ON_MONSTER_MOVE, packet.time, packet.number);
@@ -469,7 +469,7 @@ namespace CreatureScriptsParser
                             updatePacketsList.Add(updatePacket);
                         }
                     }
-                    else if (lines[itr.Key].Contains("UpdateType: 0 (Values)") && lines[itr.Key + 1].IsCreatureLine())
+                    else if (lines[itr.Key].Contains("UpdateType: Values") && lines[itr.Key + 1].IsCreatureLine())
                     {
                         UpdateObjectPacket updatePacket = new UpdateObjectPacket(PacketTypes.SMSG_UPDATE_OBJECT, packet.time, packet.number, UpdateType.Values, ObjectType.Creature);
 
@@ -525,7 +525,7 @@ namespace CreatureScriptsParser
                             }
                         });
                     }
-                    else if ((lines[itr.Key].Contains("UpdateType: 1 (CreateObject1)") || lines[itr.Key].Contains("UpdateType: 2 (CreateObject2)")) && lines[itr.Key + 1].IsConversationLine())
+                    else if ((lines[itr.Key].Contains("UpdateType: CreateObject1") || lines[itr.Key].Contains("UpdateType: CreateObject2")) && lines[itr.Key + 1].IsConversationLine())
                     {
                         UpdateObjectPacket updatePacket = new UpdateObjectPacket(PacketTypes.SMSG_UPDATE_OBJECT, packet.time, packet.number, UpdateType.CreateObject, ObjectType.Conversation);
                         updatePacket.conversationActors = new List<string>();
