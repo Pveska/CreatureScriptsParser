@@ -1926,11 +1926,11 @@ namespace CreatureScriptsParser
 
             public PlayObjectSoundPacket(PacketTypes type, TimeSpan time, long number) : base(type, time, number) { }
 
-            public static uint GetSoundIdFromLine(string line)
+            public static uint GetSoundKitIdFromLine(string line)
             {
-                Regex soundIdRegexRegex = new Regex(@"SoundId:{1}\s+\d+");
+                Regex soundIdRegexRegex = new Regex(@"SoundKitId:{1}\s+\d+");
                 if (soundIdRegexRegex.IsMatch(line))
-                    return Convert.ToUInt32(soundIdRegexRegex.Match(line).ToString().Replace("SoundId: ", ""));
+                    return Convert.ToUInt32(soundIdRegexRegex.Match(line).ToString().Replace("SoundKitId: ", ""));
 
                 return 0;
             }
@@ -1944,8 +1944,8 @@ namespace CreatureScriptsParser
                     if (LineGetters.GetGuidFromLine(lines[x], sourceObjectGuid: true) != "")
                         soundPacket.guid = LineGetters.GetGuidFromLine(lines[x], sourceObjectGuid: true);
 
-                    else if (GetSoundIdFromLine(lines[x]) != 0)
-                        soundPacket.SoundId = GetSoundIdFromLine(lines[x]);
+                    else if (GetSoundKitIdFromLine(lines[x]) != 0)
+                        soundPacket.SoundId = GetSoundKitIdFromLine(lines[x]);
 
                     else if (MonsterMovePacket.GetPositionFromLine(lines[x]).IsValid())
                         soundPacket.position = MonsterMovePacket.GetPositionFromLine(lines[x]);
